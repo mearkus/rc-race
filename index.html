@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>RC Race</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #111;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <script src="js/constants.js"></script>
+  <script src="js/track/TrackData.js"></script>
+  <script src="js/track/TrackRenderer.js"></script>
+  <script src="js/track/TrackCollider.js"></script>
+  <script src="js/car/CarPhysics.js"></script>
+  <script src="js/car/CarRenderer.js"></script>
+  <script src="js/ai/AIController.js"></script>
+  <script src="js/ui/TouchControls.js"></script>
+  <script src="js/ui/HUD.js"></script>
+  <script src="js/scenes/BootScene.js"></script>
+  <script src="js/scenes/MenuScene.js"></script>
+  <script src="js/scenes/TrackSelectScene.js"></script>
+  <script src="js/scenes/RaceScene.js"></script>
+  <script src="js/scenes/ResultsScene.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Prevent pull-to-refresh on iOS Safari
+    document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  </script>
+</body>
+</html>
