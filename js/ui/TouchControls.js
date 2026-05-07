@@ -2,30 +2,17 @@ class TouchControls {
   constructor(scene) {
     this.scene   = scene;
     this.state   = { left: false, right: false, gas: false, brake: false };
-    this._active = {}; // pointerId -> Set of button names pressed
-
-    // Button layout (fixed to camera — screen coords)
-    const W = GAME_WIDTH, H = GAME_HEIGHT;
-    this.buttons = {
-      left:  new Phaser.Geom.Rectangle(0,       H - 200, 120, 100),
-      right: new Phaser.Geom.Rectangle(120,     H - 200, 120, 100),
-      gas:   new Phaser.Geom.Rectangle(W - 140, H - 200, 140, 110),
-      brake: new Phaser.Geom.Rectangle(W - 140, H -  90, 140, 90),
-    };
+    this._active = {};
 
     this._g = scene.add.graphics();
-    this._g.setScrollFactor(0);
-    this._g.setDepth(10);
+    this._g.setScrollFactor(0).setDepth(10);
 
-    this._labels = {};
     const lblStyle = { fontSize: '28px', color: '#ffffff', stroke: '#000', strokeThickness: 3 };
     const icons = { left: '◀', right: '▶', gas: '⬆', brake: '⬇' };
+    this._labels = {};
     for (const [name, icon] of Object.entries(icons)) {
-      const r = this.buttons[name];
-      const t = scene.add.text(r.centerX, r.centerY, icon, lblStyle);
-      t.setOrigin(0.5, 0.5);
-      t.setScrollFactor(0);
-      t.setDepth(11);
+      const t = scene.add.text(0, 0, icon, lblStyle);
+      t.setOrigin(0.5, 0.5).setScrollFactor(0).setDepth(11);
       this._labels[name] = t;
     }
 
@@ -39,9 +26,51 @@ class TouchControls {
       brk:   Phaser.Input.Keyboard.KeyCodes.X,
     });
 
+    this._buildLayout();
+
+    scene.scale.on('resize', () => {
+      this._buildLayout();
+      this._active = {};
+      this._recalc();
+    });
+
     scene.input.on('pointerdown', p => this._onDown(p));
     scene.input.on('pointermove', p => this._onMove(p));
     scene.input.on('pointerup',   p => this._onUp(p));
+  }
+
+  _buildLayout() {
+    const W = this.scene.scale.width;
+    const H = this.scene.scale.height;
+    const landscape = W > H;
+
+    if (landscape) {
+      // Controls on left and right sides
+      const bw = Math.min(W * 0.14, 100);
+      const bh = Math.min(H * 0.42, 120);
+      const mid = H / 2;
+      this.buttons = {
+        left:  new Phaser.Geom.Rectangle(8,         mid - bh - 4, bw, bh),
+        right: new Phaser.Geom.Rectangle(8,         mid + 4,      bw, bh),
+        gas:   new Phaser.Geom.Rectangle(W - bw - 8, mid - bh - 4, bw, bh),
+        brake: new Phaser.Geom.Rectangle(W - bw - 8, mid + 4,      bw, bh),
+      };
+    } else {
+      // Controls at the bottom
+      const ctrlH = Math.min(H * 0.23, 180);
+      const half  = ctrlH / 2;
+      const lrW   = W * 0.27;
+      this.buttons = {
+        left:  new Phaser.Geom.Rectangle(0,         H - ctrlH, lrW,       half),
+        right: new Phaser.Geom.Rectangle(lrW,       H - ctrlH, lrW,       half),
+        gas:   new Phaser.Geom.Rectangle(W - lrW,   H - ctrlH, lrW,       half),
+        brake: new Phaser.Geom.Rectangle(W - lrW,   H - half,  lrW,       half),
+      };
+    }
+
+    for (const [name, rect] of Object.entries(this.buttons)) {
+      this._labels[name].setPosition(rect.centerX, rect.centerY);
+    }
   }
 
   _hitButtons(px, py) {
@@ -52,25 +81,14 @@ class TouchControls {
     return hits;
   }
 
-  _toCanvasCoords(pointer) {
-    // Convert screen pointer to game canvas coords
-    const scale = this.scene.scale;
-    return {
-      x: (pointer.x - scale.canvasBounds.left) / scale.displayScale.x,
-      y: (pointer.y - scale.canvasBounds.top)  / scale.displayScale.y,
-    };
-  }
-
   _onDown(p) {
-    const c = this._toCanvasCoords(p);
-    this._active[p.id] = this._hitButtons(c.x, c.y);
+    this._active[p.id] = this._hitButtons(p.x, p.y);
     this._recalc();
   }
 
   _onMove(p) {
     if (!p.isDown) return;
-    const c = this._toCanvasCoords(p);
-    this._active[p.id] = this._hitButtons(c.x, c.y);
+    this._active[p.id] = this._hitButtons(p.x, p.y);
     this._recalc();
   }
 

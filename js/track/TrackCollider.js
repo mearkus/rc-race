@@ -65,6 +65,30 @@ const TrackCollider = {
       carState.lap + (carState.checkpointsHit / TOTAL_CHECKPOINTS);
   },
 
+  // Push car back onto the road if it crosses the boundary
+  constrainToTrack(car, track) {
+    const nearestIdx = this.nearestSplineIndex(car.x, car.y, track);
+    const sp   = track.splinePoints[nearestIdx];
+    const dx   = car.x - sp.x;
+    const dy   = car.y - sp.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const limit = track.roadWidth / 2 - 6;
+
+    if (dist > limit && dist > 0) {
+      const nx = dx / dist;
+      const ny = dy / dist;
+      // Snap position to road edge
+      car.x = sp.x + nx * limit;
+      car.y = sp.y + ny * limit;
+      // Kill the outward velocity component (bounce off wall)
+      const outward = car.vx * nx + car.vy * ny;
+      if (outward > 0) {
+        car.vx -= nx * outward;
+        car.vy -= ny * outward;
+      }
+    }
+  },
+
   // Rank array of car states by progress, set .position on each
   updatePositions(carStates) {
     const sorted = [...carStates].sort((a, b) => {
