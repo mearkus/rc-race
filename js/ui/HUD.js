@@ -11,36 +11,23 @@ class HUD {
     this._lap = scene.add.text(8, 8, 'LAP 1/3', style(20));
     this._lap.setScrollFactor(0).setDepth(10);
 
-    this._pos = scene.add.text(0, 8, '1st', style(26));
+    this._pos = scene.add.text(GAME_WIDTH / 2, 8, '1st', style(26));
     this._pos.setOrigin(0.5, 0).setScrollFactor(0).setDepth(10);
 
-    this._spd = scene.add.text(0, 8, '0 km/h', style(16));
+    this._spd = scene.add.text(GAME_WIDTH - 8, 8, '0 km/h', style(16));
     this._spd.setOrigin(1, 0).setScrollFactor(0).setDepth(10);
 
-    this._cd = scene.add.text(0, 0, '', {
+    this._cd = scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60, '', {
       fontSize: '96px', color: '#ffff00',
       stroke: '#000', strokeThickness: 6, fontStyle: 'bold',
     });
     this._cd.setOrigin(0.5, 0.5).setScrollFactor(0).setDepth(12);
 
-    this._msg = scene.add.text(0, 0, '', {
+    this._msg = scene.add.text(GAME_WIDTH / 2, GAME_HEIGHT / 2 - 60, '', {
       fontSize: '48px', color: '#ffffff',
       stroke: '#000', strokeThickness: 5, fontStyle: 'bold',
     });
     this._msg.setOrigin(0.5, 0.5).setScrollFactor(0).setDepth(12);
-
-    this._reposition();
-
-    scene.scale.on('resize', () => this._reposition());
-  }
-
-  _reposition() {
-    const W = this._scene.scale.width;
-    const H = this._scene.scale.height;
-    this._pos.setX(W / 2);
-    this._spd.setX(W - 8);
-    this._cd.setPosition(W / 2, H / 2 - 60);
-    this._msg.setPosition(W / 2, H / 2 - 60);
   }
 
   update(lap, totalLaps, position, speedPx) {

@@ -44,8 +44,7 @@ class RaceScene extends Phaser.Scene {
 
     // Camera follows player
     this.cameras.main.startFollow(this._playerGfx, true, 0.12, 0.12);
-    this._updateZoom();
-    this.scale.on('resize', () => this._updateZoom());
+    this.cameras.main.setZoom(1.4);
 
     // UI
     this._controls = new TouchControls(this);
@@ -55,11 +54,6 @@ class RaceScene extends Phaser.Scene {
     this._startCountdown();
 
     this.cameras.main.fadeIn(400, 0, 0, 0);
-  }
-
-  _updateZoom() {
-    const landscape = this.scale.width > this.scale.height;
-    this.cameras.main.setZoom(landscape ? 1.1 : 1.4);
   }
 
   _buildGrid() {

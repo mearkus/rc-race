@@ -10,7 +10,7 @@ const config = {
   height: GAME_HEIGHT,
   backgroundColor: '#2f6338',
   scale: {
-    mode:       Phaser.Scale.RESIZE,
+    mode:       Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   input: {
