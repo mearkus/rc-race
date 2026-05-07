@@ -1,4 +1,4 @@
-name: Deploy to mearkus.com/rc-racer
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -7,26 +7,31 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: deploy-rc-racer
+  group: pages
   cancel-in-progress: true
 
 jobs:
   deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to mearkus.github.io under rc-racer/
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          repository-name: mearkus/mearkus.github.io
-          branch: main
-          folder: .
-          target-folder: rc-racer
-          token: ${{ secrets.DEPLOY_TOKEN }}
-          git-config-name: github-actions[bot]
-          git-config-email: github-actions[bot]@users.noreply.github.com
-          clean: true
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
